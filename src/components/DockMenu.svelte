@@ -38,9 +38,9 @@
   export let className: string;
   export { className as class };
   export const items: DockEntry[] = [
-    { id: "1", href: "/home", icon: icons["homeIcon"] },
-    { id: "2", href: "/albums", icon: icons["albumIcon"] },
-    { id: "3", href: "/monitor", icon: icons["monitorIcon"] },
+    { id: "1", href: "/", icon: icons["homeIcon"] },
+    { id: "2", href: "/s3", icon: icons["albumIcon"] },
+    { id: "3", href: "/ftp", icon: icons["monitorIcon"] },
   ];
 
   const mouseX = useMotionValue(Infinity);

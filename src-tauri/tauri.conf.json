@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "explorerpp",
+        "title": "Explorer++",
         "width": 800,
         "height": 600
       }
