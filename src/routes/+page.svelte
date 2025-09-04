@@ -13,11 +13,13 @@
   import { ChevronLeft, ChevronRight, RotateCw, LayoutList, LayoutGrid, Search, Folder, File, ChevronDown } from 'lucide-svelte';
 
   type Entry = { name: string; isDir: boolean };
+  type PathFile = { name: string; is_folder: boolean };
+  
   let entries: Entry[] = [];
   let filtered: Entry[] = [];
   let loading = false;
 
-  let currentPath = ['.']; // simple breadcrumb demo; swap with a real path resolver if desired
+  let currentPath = ['./'];
   let viewMode: 'list' | 'grid' = 'list';
   let query = '';
   let sortBy: 'name-asc' | 'name-desc' = 'name-asc';
@@ -25,9 +27,8 @@
   async function loadDir() {
     loading = true;
     try {
-      const names = await invoke<string[]>('list_files_dir');
-      // In real apps, return metadata from Rust (is_dir, size, modified). For now: guess folders by suffix.
-      entries = names.map((n) => ({ name: n, isDir: false }));
+      const dir_files = await invoke<PathFile[]>('list_files_dir');
+      entries = dir_files.map((f) => ({ name: f.name, isDir: f.is_folder }));
       applyFilters();
     } catch (err) {
       console.error('loadDir failed', err);
@@ -173,11 +174,11 @@
                 </tr>
               </thead>
               <tbody>
-                {#each filtered as it}
-                  <tr class="border-b hover:bg-muted/50 cursor-default" on:dblclick={() => openEntry(it)}>
+                {#each filtered as item}
+                  <tr class="border-b hover:bg-muted/50 cursor-default" on:dblclick={() => openEntry(item)}>
                     <td class="px-4 py-2 flex items-center gap-2">
-                      {#if it.isDir}<Folder class="w-4 h-4 opacity-80" />{:else}<File class="w-4 h-4 opacity-80" />{/if}
-                      <span class="truncate">{it.name}</span>
+                      {#if item.isDir}<Folder class="w-4 h-4 opacity-80" />{:else}<File class="w-4 h-4 opacity-80" />{/if}
+                      <span class="truncate">{item.name}</span>
                     </td>
                   </tr>
                 {/each}
@@ -187,14 +188,14 @@
         {:else}
           <ScrollArea class="h-full">
             <div class="p-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-              {#each filtered as it}
+              {#each filtered as item}
                 <button class="group w-full aspect-square rounded-2xl border bg-card hover:bg-accent transition-colors p-3 flex flex-col items-center justify-center"
-                        on:dblclick={() => openEntry(it)}>
+                        on:dblclick={() => openEntry(item)}>
                   <div class="mb-2">
-                    {#if it.isDir}<Folder class="w-10 h-10 opacity-80 group-hover:opacity-100" />
+                    {#if item.isDir}<Folder class="w-10 h-10 opacity-80 group-hover:opacity-100" />
                     {:else}<File class="w-10 h-10 opacity-80 group-hover:opacity-100" />{/if}
                   </div>
-                  <div class="text-xs text-center line-clamp-2">{it.name}</div>
+                  <div class="text-xs text-center line-clamp-2">{item.name}</div>
                 </button>
               {/each}
             </div>

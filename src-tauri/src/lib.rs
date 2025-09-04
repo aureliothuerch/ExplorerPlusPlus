@@ -1,11 +1,13 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-use std::{collections::HashMap, fs};
+use std::{fs};
+use serde::{Serialize, Deserialize};
 
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct PathFile {
     name: String,
     is_folder: bool,
@@ -27,6 +29,9 @@ fn list_files_dir() -> Result<Vec<PathFile>, String> {
             };
 
             files_list.push(path_file);
+        }
+        else {
+            return Err("Failed to read a directory entry".to_string());
         }
     }
 
