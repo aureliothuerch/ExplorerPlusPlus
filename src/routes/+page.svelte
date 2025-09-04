@@ -13,13 +13,12 @@
   import { ChevronLeft, ChevronRight, RotateCw, LayoutList, LayoutGrid, Search, Folder, File, ChevronDown } from 'lucide-svelte';
 
   type Entry = { name: string; isDir: boolean };
-  type PathFile = { name: string; is_folder: boolean };
-  
+
   let entries: Entry[] = [];
   let filtered: Entry[] = [];
   let loading = false;
 
-  let currentPath = ['./'];
+  let currentPath = ['C:\\Projects\\startup\\Thuer'];
   let viewMode: 'list' | 'grid' = 'list';
   let query = '';
   let sortBy: 'name-asc' | 'name-desc' = 'name-asc';
@@ -27,8 +26,8 @@
   async function loadDir() {
     loading = true;
     try {
-      const dir_files = await invoke<PathFile[]>('list_files_dir');
-      entries = dir_files.map((f) => ({ name: f.name, isDir: f.is_folder }));
+      const dir_files = await invoke<Entry[]>('list_files_dir');
+      entries = dir_files.map((f) => ({ name: f.name, isDir: f.isDir }));
       applyFilters();
     } catch (err) {
       console.error('loadDir failed', err);

@@ -1,23 +1,20 @@
 use std::{fs};
 use serde::{Serialize, Deserialize};
 
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct PathFile {
     name: String,
-    is_folder: bool,
+    is_dir: bool,
 }
 
 #[tauri::command]
 fn list_files_dir() -> Result<Vec<PathFile>, String> {
     let mut files_list: Vec<PathFile> = Vec::new();
-    
-    let files = fs::read_dir("C:/Projects/st/Thuer/").map_err(|e| e.to_string())?;
+    let path: String = r"C:\Projects\startup\Thuer".to_string();
+
+    let files =  fs::read_dir(&path).map_err(|e| e.to_string())?;
+
     for file in files {
         if let Ok(de) = file {
             let file_name = de.file_name();
@@ -25,7 +22,7 @@ fn list_files_dir() -> Result<Vec<PathFile>, String> {
             
             let path_file = PathFile {
                 name: entry,
-                is_folder: true,
+                is_dir: de.path().is_dir(),
             };
 
             files_list.push(path_file);
