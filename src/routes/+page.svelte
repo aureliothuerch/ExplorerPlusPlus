@@ -1,8 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { invoke } from '@tauri-apps/api/core';
-
-  // shadcn-svelte (optional, aber nice)
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import {
@@ -12,8 +10,6 @@
   import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from '$lib/components/ui/breadcrumb';
   import { ScrollArea } from '$lib/components/ui/scroll-area';
   import { Separator } from '$lib/components/ui/separator';
-
-  // lucide-svelte Icons (install: npm i lucide-svelte)
   import { ChevronLeft, ChevronRight, RotateCw, LayoutList, LayoutGrid, Search, Folder, File, ChevronDown } from 'lucide-svelte';
 
   type Entry = { name: string; isDir: boolean };
