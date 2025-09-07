@@ -8,7 +8,7 @@
     File
   } from "lucide-svelte";
   import Toolbar from "$components/Toolbar.svelte";
-  import { START_PATH } from "$env/static/private";
+  import { PUBLIC_START_PATH } from "$env/static/public";
 
   type Entry = { name: string; isDir: boolean };
 
@@ -16,15 +16,13 @@
   let sortBy = $state<"name-asc" | "name-desc">("name-asc");
   let query = $state("");
   let loading = $state(false);
-  let currentPath = $state([START_PATH]);
+  let currentPath = $state<string>(PUBLIC_START_PATH);
 
   async function loadDir() {
     console.log("Loading dir...");
     loading = true;
     try {
-      const base =
-        currentPath[currentPath.length - 1] ?? "C:\\Projects\\st\\Thuer";
-      const dir_files = await invoke<Entry[]>("list_files", { path: base });
+      const dir_files = await invoke<Entry[]>("list_files", { path: currentPath });
       entries = dir_files.map((f) => ({ name: f.name, isDir: f.isDir }));
     } catch (err) {
       console.error("loadDir failed", err);
@@ -34,9 +32,15 @@
     console.log("Finished loading dir!");
   }
 
-    function navigateBreadcrumb(index: number) {
-    currentPath = currentPath.slice(0, index + 1);
-    // call into Rust to list that path; for demo we reuse current dir
+  // compute a new path when a breadcrumb is clicked
+  function navigateBreadcrumb(index: number) {
+    const segs = (currentPath ?? "").split(/[\\\/]+/).filter(Boolean);
+    const sep = currentPath.includes("\\") ? "\\" : "/";
+    // preserve root (drive letter or leading slash)
+    const rootMatch = currentPath.match(/^[A-Za-z]:[\\/]|^[\\/]/);
+    const root = rootMatch ? rootMatch[0].replace(/\/$/, "") : "";
+    const next = [root, segs.slice(0, index + 1).join(sep)].filter(Boolean).join(sep);
+    currentPath = next || currentPath;
     loadDir();
   }
 
@@ -80,7 +84,7 @@
       {sortBy}
       {query}
       {loading}
-      onNavigateBreadcrumb={(i) => { currentPath = currentPath.slice(0, i + 1); loadDir(); }}
+      onNavigateBreadcrumb={(i) => navigateBreadcrumb(i)}
       onToggleView={(m) => viewMode = m}
       onSetSort={(s) => sortBy = s}
       onRefresh={() => loadDir()}
