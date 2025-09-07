@@ -3,21 +3,21 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct PathFile {
+struct PathItem {
     name: String,
     is_dir: bool,
 }
 
 #[tauri::command]
-fn list_files(path: String) -> Result<Vec<PathFile>, String> {
-    let mut files_list: Vec<PathFile> = Vec::new();
+fn list_files(path: String) -> Result<Vec<PathItem>, String> {
+    let mut files_list: Vec<PathItem> = Vec::new();
     
     let files = fs::read_dir(&path).map_err(|e| e.to_string())?;
     for file in files {
         if let Ok(de) = file {
             let file_name = de.file_name();
             let entry = file_name.to_string_lossy().into_owned();
-            let path_file = PathFile {
+            let path_file = PathItem {
                 name: entry,
                 is_dir: de.path().is_dir(),
             };

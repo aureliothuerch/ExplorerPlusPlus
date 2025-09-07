@@ -10,7 +10,7 @@
   import Toolbar from "$components/Toolbar.svelte";
   import { PUBLIC_START_PATH } from "$env/static/public";
 
-  type Entry = { name: string; isDir: boolean };
+  type PathItem = { name: string; isDir: boolean };
 
   let viewMode = $state<"list" | "grid">("list");
   let sortBy = $state<"name-asc" | "name-desc">("name-asc");
@@ -22,7 +22,7 @@
     console.log("Loading dir...");
     loading = true;
     try {
-      const dir_files = await invoke<Entry[]>("list_files", { path: currentPath });
+      const dir_files = await invoke<PathItem[]>("list_files", { path: currentPath });
       entries = dir_files.map((f) => ({ name: f.name, isDir: f.isDir }));
     } catch (err) {
       console.error("loadDir failed", err);
@@ -52,7 +52,7 @@
     loadDir();
   }
 
-  let entries = $state<Entry[]>([]);
+  let entries = $state<PathItem[]>([]);
   const filtered = $derived.by(() => {
     const q = query.trim().toLowerCase();
     return entries
@@ -64,8 +64,8 @@
       });
   });
 
-  async function openEntry(item: Entry) {
-    // open with opener
+  async function openPathItem(item: PathItem) {
+    console.log("Opening item", item);
   }
 
   onMount(loadDir);
@@ -113,7 +113,7 @@
               {#each filtered as item (item.name)}
                 <tr
                   class="border-b hover:bg-muted/100 cursor-default"
-                  ondblclick={() => openEntry(item)}
+                  ondblclick={() => openPathItem(item)}
                 >
                   <td class="px-4 py-2 flex items-center gap-2">
                     {#if item.isDir}<Folder class="w-4 h-4 opacity-80" />
@@ -134,7 +134,7 @@
             {#each filtered as item (item.name)}
               <button
                 class="group w-full aspect-square rounded-2xl border bg-card hover:bg-accent transition-colors p-3 flex flex-col items-center justify-center"
-                ondblclick={() => openEntry(item)}
+                ondblclick={() => openPathItem(item)}
               >
                 <div class="mb-2">
                   {#if item.isDir}<Folder
