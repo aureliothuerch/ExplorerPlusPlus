@@ -17,13 +17,14 @@
   let query = $state("");
   let loading = $state(false);
   let currentPath = $state<string>(PUBLIC_START_PATH);
+  let all_path_files = $state<PathItem[]>([]);
 
   async function loadDir() {
     console.log("Loading dir...");
     loading = true;
     try {
       const dir_files = await invoke<PathItem[]>("list_files", { path: currentPath });
-      entries = dir_files.map((f) => ({ name: f.name, isDir: f.isDir }));
+      all_path_files = dir_files.map((f) => ({ name: f.name, isDir: f.isDir }));
     } catch (err) {
       console.error("loadDir failed", err);
     } finally {
@@ -52,10 +53,9 @@
     loadDir();
   }
 
-  let entries = $state<PathItem[]>([]);
   const filtered = $derived.by(() => {
     const q = query.trim().toLowerCase();
-    return entries
+    return all_path_files
       .filter((e) => (q ? e.name.toLowerCase().includes(q) : true))
       .sort((a, b) => {
         if (sortBy === "name-asc") return a.name.localeCompare(b.name);
